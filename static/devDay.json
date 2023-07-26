@@ -2,7 +2,41 @@
     {
         "id": "0",
         "title": "One Piece",
-        "thumbnailUrl": "thumbnails/one-piece.jpg",
-        "videoUrl": "videos/one-piece.mp4"
+        "slug": "one-piece"
+    },
+    {
+        "id": "1",
+        "title": "Haikyuu!!",
+        "slug": "haikyuu"
+    },
+    {
+        "id": "2",
+        "title": "Jujutsu Kaisen",
+        "slug": "jujutsu-kaisen"
+    },
+    {
+        "id": "3",
+        "title": "Assassination Classroom",
+        "slug": "ass-class"
+    },
+    {
+        "id": "4",
+        "title": "Cowboy Bebop",
+        "slug": "cowboy-bebop"
+    },
+    {
+        "id": "5",
+        "title": "Lycoris Recoil",
+        "slug": "lycoris-recoil"
+    },
+    {
+        "id": "6",
+        "title": "Yuri!!! On Ice",
+        "slug": "yuri-on-ice"
+    },
+    {
+        "id": "7",
+        "title": "Hunter x Hunter",
+        "slug": "hunter-hunter"
     }
 ]

@@ -21,7 +21,7 @@ func main() {
 	routers.RedirectRouter(router)
 	routers.DefaultRouter(router)
 	routers.S3Router(router)
-	routers.MiscRouter(router)
+	routers.DevDayRouter(router)
 
 	// Start router
 	router.Run()

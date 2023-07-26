@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	CDN_URL = "https://cdn.michaelzhao.xyz/hackutd-devday-workshop/"
+	CDN_URL = "https://cdn.michaelzhao.xyz/hackutd-devday-workshop"
 )
 
-func MiscRouter(router *gin.Engine) {
+func DevDayRouter(router *gin.Engine) {
 	// GET /devday/help - returns the API reference
 	router.GET("/devday/help", func(ctx *gin.Context) {
 		videoFormat := gin.H{
@@ -45,17 +45,18 @@ func MiscRouter(router *gin.Engine) {
 		}
 
 		// Unmarshal the JSON
-		var videos []Video
-		err = json.Unmarshal(data, &videos)
+		var videoData []VideoData
+		err = json.Unmarshal(data, &videoData)
 		if err != nil {
 			log.Printf("Invalid devDay.json file\n")
 			ctx.Status(http.StatusInternalServerError)
 			return
 		}
 
-		// Update the video URLs
-		for idx := range videos {
-			updateUrls(&videos[idx])
+		// Update the videos URLs
+		videos := make([]Video, len(videoData))
+		for idx := range videoData {
+			videos[idx] = *createVideo(&videoData[idx])
 		}
 
 		// Send data to user
@@ -73,7 +74,7 @@ func MiscRouter(router *gin.Engine) {
 		}
 
 		// Unmarshal the JSON
-		var videos []Video
+		var videos []VideoData
 		err = json.Unmarshal(data, &videos)
 		if err != nil {
 			log.Printf("Invalid devDay.json file\n")
@@ -85,9 +86,9 @@ func MiscRouter(router *gin.Engine) {
 		id := ctx.Param("id")
 
 		// Search through the video file and return the matching ID
-		for _, video := range videos {
-			if video.Id == id {
-				updateUrls(&video)
+		for _, videoData := range videos {
+			if videoData.Id == id {
+				video := createVideo(&videoData)
 				ctx.JSON(http.StatusOK, video)
 				return
 			}
@@ -100,6 +101,12 @@ func MiscRouter(router *gin.Engine) {
 	})
 }
 
+type VideoData struct {
+	Id    string `json:"id"`
+	Title string `json:"title"`
+	Slug  string `json:"slug"`
+}
+
 type Video struct {
 	Id           string `json:"id"`
 	Title        string `json:"title"`
@@ -107,9 +114,13 @@ type Video struct {
 	VideoUrl     string `json:"videoUrl"`
 }
 
-// updateUrls will combine the CDN_URL with the given
-// thumbnail and video urls
-func updateUrls(video *Video) {
-	video.ThumbnailUrl = CDN_URL + video.ThumbnailUrl
-	video.VideoUrl = CDN_URL + video.VideoUrl
+// createVideo will combine the CDN_URL with the given
+// thumbnail and video urls to form a video object
+func createVideo(videoData *VideoData) *Video {
+	return &Video{
+		Id:           videoData.Id,
+		Title:        videoData.Title,
+		ThumbnailUrl: fmt.Sprintf("%s/thumbnails/%s.jpg", CDN_URL, videoData.Slug),
+		VideoUrl:     fmt.Sprintf("%s/videos/%s.mp4", CDN_URL, videoData.Slug),
+	}
 }
