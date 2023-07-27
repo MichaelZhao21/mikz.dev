@@ -88,6 +88,19 @@ func S3Router(router *gin.Engine) {
 
 	// Upload route
 	router.POST("/s3/upload", func(ctx *gin.Context) {
+		// Get token from cookies
+		cookieToken, err := ctx.Cookie("token")
+		if err != nil {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"message": "token cookie not found", "ok": false})
+			return
+		}
+
+		// Check token
+		if cookieToken != token {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid token cookie", "ok": false})
+			return
+		}
+
 		// Get file from form data
 		fileHeader, err := ctx.FormFile("file")
 		if err != nil {
