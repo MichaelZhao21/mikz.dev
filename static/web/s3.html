@@ -1,18 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="/static/styles.css" />
+        <title>S3 Upload</title>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
-    <title>S3 Upload</title>
-</head>
+    <body>
+        <h1>Upload 🎁</h1>
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%">
+            <label id="file-upload-label" class="file-upload-label" for="file-upload"> Click to upload </label>
+            <input id="file-upload" name="file" type="file" hidden />
+            <input id="path-upload" name="path" type="text" placeholder="Path" style="margin-top: 1.5rem" />
+            <br />
+            <p id="error-message"></p>
+            <button onclick="submit()">SUBMIT</button>
+        </div>
+        <div
+            id="upload-cover"
+            style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000000b2;
+                backdrop-filter: blur(10px);
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            "
+        >
+            <h1 style="color: white">Pladogin...</h1>
+            <div class="loader"></div>
+        </div>
 
-<body>
-    <h1>Upload 🎁</h1>
-</body>
+        <script src="/static/util.js"></script>
+        <script>
+            // On load, check for valid token
+            // also clear input field
+            document.body.onload = async () => {
+                document.getElementById("file-upload").value = "";
 
+                const res = await fetch("/s3/token", {
+                    method: "POST",
+                    credentials: "include",
+                });
+
+                if (res.status !== 200) {
+                    console.error("Invalid auth token!");
+                    document.location.href = "/s3/login";
+                    return;
+                }
+
+                body = await res.json();
+                if (!body.ok) {
+                    console.error("Invalid auth token!");
+                    document.location.href = "/s3/login";
+                    return;
+                }
+
+                // If nothing wrong, don't do anything :)
+            };
+
+            // On file upload, change text of label
+            document.getElementById("file-upload").addEventListener("change", (event) => {
+                document.getElementById("error-message").style.display = "none";
+
+                const fileName = document.getElementById("file-upload").files[0].name;
+                document.getElementById("file-upload-label").innerHTML = fileName;
+            });
+
+            // On path change, remove error
+            document.getElementById("path-upload").addEventListener("keydown", (event) => {
+                document.getElementById("error-message").style.display = "none";
+            });
+
+            // When the submit button is clicked, check for file and
+            // path and upload.
+            async function submit() {
+                // Check for file to upload
+                const fileElement = document.getElementById("file-upload");
+                if (fileElement.files.length == 0) {
+                    document.getElementById("error-message").innerHTML = "You've not uploaded a file D:";
+                    document.getElementById("error-message").style.display = "flex";
+                    return;
+                }
+                const file = fileElement.files[0];
+
+                // Check for path
+                const path = document.getElementById("path-upload").value;
+                if (path === "") {
+                    document.getElementById("error-message").innerHTML = "You've not entered a path D:";
+                    document.getElementById("error-message").style.display = "flex";
+                    return;
+                }
+
+                // Create multipart form data
+                const data = new FormData();
+                data.append("file", file);
+                data.append("path", path);
+
+                // Upload screen
+                document.getElementById("upload-cover").style.display = "flex";
+
+                // Send request
+                const res = await fetch("/s3/upload", {
+                    method: "POST",
+                    body: data,
+                    credentials: "include",
+                });
+
+                // Close upload screen
+                document.getElementById("upload-cover").style.display = "none";
+
+                if (res.status != 200) {
+                    data = await res.json();
+                    document.getElementById("error-message").innerHTML = "error uploading: " + data.message;
+                    document.getElementById("error-message").style.display = "flex";
+                    return;
+                }
+
+                // Reset form
+                document.getElementById("file-upload").value = "";
+                document.getElementById("path-upload").value = "";
+                document.getElementById("file-upload-label").innerHTML = "Click to upload";
+
+                // Tell user upload success
+                alert(file.name + " has been uploaded successfully!");
+            }
+        </script>
+    </body>
 </html>

@@ -1,46 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="/static/styles.css" />
+        <title>Login</title>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
-    <title>Login</title>
-</head>
+    <body>
+        <h1>Log In 🙈</h1>
+        <input type="password" id="password-input" />
+        <p id="error-message"></p>
+        <button onclick="submit()">SUBMIT</button>
 
-<body>
-    <h1>Log In 🙈</h1>
-    <input type="password" id="password-input" />
-    <button onclick="submit()">Submit</button>
+        <script src="/static/util.js"></script>
+        <script>
+            // Submit function
+            async function submit() {
+                const pwd = document.getElementById("password-input").value;
 
-    <script>
-        // Submit function
-        async function submit() {
-            const pwd = document.getElementById("password-input").value;
+                const res = await fetch("/s3/login", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        password: pwd,
+                    }),
+                });
 
-            const res = await fetch("/s3/login", {
-                method: "POST",
-                body: JSON.stringify({
-                    password: pwd,
-                })
+                // If ok, store token and redirect to s3 page
+                if (res.status === 200) {
+                    body = await res.json();
+                    setCookie("token", body.token);
+                    document.location.href = "/s3"
+                    return
+                }
+
+                // If not OK
+                document.getElementById("error-message").innerHTML =
+                    res.status === 400 ? "Invalid password" : "Internal server error";
+                document.getElementById("error-message").style.display = "flex";
+            }
+
+            // Add event listener to password input box and focus on it
+            // also clear error message field if typed
+            document.getElementById("password-input").addEventListener("keydown", (e) => {
+                document.getElementById("error-message").style.display = "none";
+                if (e.key === "Enter") {
+                    submit();
+                }
             });
-
-            if (res.status === 200) {
-                
-            }
-        }
-
-        // Add event listener to password input box and focus on it
-        document.getElementById("password-input").addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                submit();
-            }
-        });
-        document.getElementById("password-input").focus();
-    </script>
-</body>
-
+            document.getElementById("password-input").focus();
+        </script>
+    </body>
 </html>
