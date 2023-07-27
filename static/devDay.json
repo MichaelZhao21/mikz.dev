@@ -38,5 +38,25 @@
         "id": "7",
         "title": "Hunter x Hunter",
         "slug": "hunter-hunter"
+    },
+    {
+        "id": "8",
+        "title": "My Hero Academia",
+        "slug": "my-hero-academia"
+    },
+    {
+        "id": "9",
+        "title": "Spy x Family",
+        "slug": "spy-family"
+    },
+    {
+        "id": "10",
+        "title": "Steins;Gate",
+        "slug": "steins-gate"
+    },
+    {
+        "id": "11",
+        "title": "Death Note",
+        "slug": "death-note"
     }
 ]
