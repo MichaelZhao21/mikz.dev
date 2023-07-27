@@ -120,8 +120,8 @@
                 document.getElementById("upload-cover").style.display = "none";
 
                 if (res.status != 200) {
-                    data = await res.json();
-                    document.getElementById("error-message").innerHTML = "error uploading: " + data.message;
+                    const errorData = await res.json();
+                    document.getElementById("error-message").innerHTML = "error uploading: " + errorData.message;
                     document.getElementById("error-message").style.display = "flex";
                     return;
                 }
