@@ -15,7 +15,12 @@ FROM scratch
 COPY --from=builder /go/bin/mikz /mikz
 COPY static /static
 
-ENV GIN_MODE "release"
-ENV PORT 80
+ENV GIN_MODE="release"
+ENV PORT=80
+ENV PASSWORD="password"
+ENV AWS_ACCESS_KEY_ID=""
+ENV AWS_SECRET_ACCESS_KEY=""
+ENV AWS_REGION="us-east-1"
+ENV AWS_S3_BUCKET="mikey-blog"
 
 ENTRYPOINT [ "/mikz" ]
