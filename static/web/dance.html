@@ -3,11 +3,12 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Dancing Man!</title>
+        <title>Dancing!</title>
         <style>
             html,
             head,
-            body {
+            body,
+            .box {
                 margin: 0;
                 width: 100%;
                 height: 100%;
@@ -24,11 +25,37 @@
                 font-size: 100px;
                 color: white;
             }
+
+            .control {
+                position: fixed;
+                left: 40px;
+                bottom: 40px;
+            }
+
+            button {
+                border: none;
+                font-size: 32px;
+                background-color: transparent;
+                color: white;
+                padding: 0 20px;
+                margin: 0 10px;
+                cursor: pointer;
+                transition-duration: 100ms;
+            }
+
+            button:hover {
+                color: #8ce2ff;
+            }
         </style>
     </head>
     <body>
         <div class="box">
             <pre id="man"></pre>
+        </div>
+        <div class="control">
+            <button onclick="setCurr(1)">cat</button>
+            <button onclick="setCurr(0)">man</button>
+            <button onclick="setCurr(2)">catman</button>
         </div>
 
         <script>
@@ -42,7 +69,7 @@
                 `  A_/\\`,
                 `/\\ _ /\\`,
                 ` _____`,
-                `/\\_-_`,
+                ` /\\_-_`,
                 ` _-_/\\`,
             ];
             const eyes = [
@@ -84,57 +111,68 @@
             const choose = (first, second) => (Math.round(Math.random()) == 0 ? first : second);
             const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-            const manDance = async () => {
-                while (true) {
-                    const l = choose('\\', '_');
-                    const m = choose('o', 'O');
-                    const r = choose('/', '_');
-                    const b = choose('(', ')');
-                    const ll = choose('/', '⅃');
-                    const rl = choose('\\', 'L');
+            var currTimer = null;
 
-                    const man = `${l}${m}${r}\n ${b}\n${ll} ${rl}`;
-                    document.getElementById('man').innerHTML = man;
-                    console.log(man);
+            const manDance = () => {
+                const l = choose('\\', '_');
+                const m = choose('o', 'O');
+                const r = choose('/', '_');
+                const b = choose('(', ')');
+                const ll = choose('/', '⅃');
+                const rl = choose('\\', 'L');
 
-                    await sleep(200);
-                }
+                const man = `${l}${m}${r}\n ${b}\n${ll} ${rl}`;
+
+                document.getElementById('man').innerHTML = man;
             };
 
-            const catDance = async () => {
-                while (true) {
-                    const a = Math.floor(Math.random() * eyes.length);
-                    const b = Math.floor(Math.random() * ears.length);
+            const catDance = () => {
+                const a = Math.floor(Math.random() * eyes.length);
+                const b = Math.floor(Math.random() * ears.length);
 
-                    const cat = ears[b] + '\n' + eyes[a];
+                const cat = ears[b] + '\n' + eyes[a];
 
-                    document.getElementById('man').innerHTML = cat;
-
-                    await sleep(800);
-                }
+                document.getElementById('man').innerHTML = cat;
             };
 
             const catManDance = async () => {
-                while (true) {
-                    const r = choose('/', '_');
-                    const b = choose('(', ')');
-                    const ll = choose('/', '⅃');
-                    const rl = choose('\\', 'L');
+                const r = choose('/', '_');
+                const b = choose('(', ')');
+                const ll = choose('/', '⅃');
+                const rl = choose('\\', 'L');
 
-                    const a = Math.floor(Math.random() * eyes.length);
-                    const ba = Math.floor(Math.random() * ears.length);
+                const a = Math.floor(Math.random() * eyes.length);
+                const ba = Math.floor(Math.random() * ears.length);
 
-                    const cat = ears[ba] + '\n' + eyes[a];
-                    const man = `   ${b}\n  ${ll} ${rl}`;
-                    const catMan = `${cat}\n${man}`;
+                const cat = ears[ba] + '\n' + eyes[a];
+                const man = `   ${b}\n  ${ll} ${rl}`;
+                const catMan = `${cat}\n${man}`;
 
-                    document.getElementById('man').innerHTML = catMan;
+                document.getElementById('man').innerHTML = catMan;
+            };
 
-                    await sleep(600);
+            const setCurr = (num) => {
+                if (currTimer) {
+                    clearInterval(currTimer);
                 }
-            }
 
-            window.onload = catManDance;
+                switch (num) {
+                    case 0:
+                        manDance();
+                        currTimer = setInterval(manDance, 200);
+                        break;
+                    case 1:
+                        catDance();
+                        currTimer = setInterval(catDance, 800);
+                        break;
+                    case 2:
+                        catManDance();
+                        currTimer = setInterval(catManDance, 600);
+                        break;
+                }
+            };
+
+            window.onload = setCurr(0);
         </script>
     </body>
 </html>
