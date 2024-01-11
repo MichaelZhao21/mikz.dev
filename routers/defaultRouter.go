@@ -10,6 +10,9 @@ func DefaultRouter(router *gin.Engine) {
 	// Default endpoint
 	router.StaticFile("/", "./static/aaaaa.webp")
 
+	// Load HTML
+	router.LoadHTMLFiles("./static/web/dance.html")
+
 	// Serve static files
 	router.Static("/static", "./static/web")
 
